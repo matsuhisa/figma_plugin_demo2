@@ -9,40 +9,31 @@ if (figma.editorType === 'figma') {
       const nodes = page.findAll(node => node.type === 'FRAME');
       console.log(nodes);
 
-      const createNodes: SceneNode[] = [];
-
-      for (let i = 0; i < nodes.length; i++) {
-        const nodeFrame = nodes[i];
-        console.log(nodeFrame.name);
-
+      nodes.forEach((node, index) => {
+        console.log(node.name);
         (async () => {
-          const bytes = await nodeFrame.exportAsync({
+          const bytes = await node.exportAsync({
             format: 'PNG',
-            constraint: { type: 'SCALE', value: 2 },
+            constraint: { type: 'SCALE', value: 1 },
           })
 
           const image = figma.createImage(bytes)
-          const frame = figma.createFrame()
+          const rect = figma.createRectangle()
 
-          frame.x = 200
-          frame.y = 250 * i
+          rect.x = 200
+          rect.y = 250 * index
 
-          frame.resize(200, 200)
-          frame.fills = [{
+          rect.resize(node.width, node.height)
+          rect.fills = [{
             imageHash: image.hash,
             scaleMode: "FILL",
             scalingFactor: 1,
             type: "IMAGE",
           }]
-
-          createNodes.push(frame);
         })();
-      }
-      figma.currentPage.selection = createNodes;
-      figma.viewport.scrollAndZoomIntoView(createNodes);
-    }
+      });
 
-    // figma.closePlugin();
+    }
   };
 }
 
